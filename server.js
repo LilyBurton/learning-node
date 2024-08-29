@@ -58,7 +58,7 @@ const server = http.createServer((req, res) => {
             ? path.join(__dirname, 'views', 'index.html')
             : contentType === 'text/html' && req.url.slice(-1) === '/'
                 ? path.join(__dirname, 'views', req.url, 'index.html')
-                : contentType === 'index.html'
+                : contentType === 'text/html'
                     ? path.join(__dirname, 'views', req.url)
                     : path.join(__dirname, req.url);
 
@@ -67,7 +67,7 @@ const server = http.createServer((req, res) => {
         const fileExists = fs.existsSync(filePath);
 
         if (fileExists) {
-
+            serveFile(filePath, contentType, res);
         } else {
             switch(path.parse(filePath).base) {
                 case 'old-page.html':
@@ -77,8 +77,9 @@ const server = http.createServer((req, res) => {
                 case 'www-page.html':
                     res.writeHead(301, { 'Location': '/' });
                     res.end();
+                    break;
                 default:
-                    // a 404 response
+                    serveFile(path.join(__dirname, 'views', '404.html'), 'text/html', res)
             }
         }
     }
